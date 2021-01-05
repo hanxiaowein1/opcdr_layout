@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TestClassAdd</title>
+</head>
+<body>
+<div id="test_class_add"></div>
+<button id="class_add">点我</button>
+<p>测试结论:<br/>
+    1.如果class已经存在一个name，那么重复add不会出现多个重复的name<br/>
+    2.如果class中没有name，那么在remove这个name的时候也不会出现错误<br/>
+    3.如果class中没有name，那么在replace这个name的时候，不会出现任何效果<br/>
+</p>
+<script>
+    let class_add = document.querySelector("#class_add")
+    class_add.addEventListener('click', event=>{
+        let test_class_add = document.querySelector("#test_class_add")
+        // test_class_add.classList.add("11111")
+        // test_class_add.classList.remove("33333")
+        test_class_add.classList.replace("111", "222")
+    })
+</script>
+</body>
+</html>

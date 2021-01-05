@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ViewJsTest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.9.0/viewer.css">
+</head>
+<body>
+<ul>
+    <li><img height="100" width="100"></li>
+</ul>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.9.0/viewer.min.js"></script>
+<script>
+    let img = document.querySelector("img")
+    img.src = '../images/1.jpg'
+    img.setAttribute("data-original", "../images/1.jpg")
+    let viewer = new Viewer(document.querySelector("ul"),{
+        url: 'data-original'
+    })
+
+</script>
+
+</body>
+</html>

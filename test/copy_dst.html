@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CopyDst</title>
+<!--    <link rel="import" href="copy_src.html">-->
+</head>
+<body>
+<template id="slideViewerTemplate">
+    <div>
+        <img class="image">
+        <div>
+            <!--有n个img-->
+            <ul>
+            </ul>
+        </div>
+    </div>
+
+</template>
+
+<!--<iframe src="copy_src.html"></iframe>-->
+<slide-viewer image="../images/1.jpg">
+
+</slide-viewer>
+
+<script>
+    class SlideViewer extends HTMLElement{
+        constructor() {
+            super();
+            let templateElem = document.querySelector("#slideViewerTemplate")
+            let content = templateElem.content.cloneNode(true)
+            content.querySelector('img').setAttribute('src', this.getAttribute('image'))
+            this.appendChild(content)
+        }
+    }
+    window.customElements.define("slide-viewer", SlideViewer)
+
+</script>
+</body>
+</html>

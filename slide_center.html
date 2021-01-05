@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SlideCenter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.9.0/viewer.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+    <link href="annotorious/annotorious.min.css" rel="stylesheet">
+    <style>
+        #all_slide_block > div{
+            display:inline-block;
+            float: left;
+        }
+    </style>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<template id="slideViewerTemplate">
+    <div>
+        <div>
+            <ul class="thumbnail_ul">
+                <img width="500" height="500" class="thumbnail">
+            </ul>
+        </div>
+        <div class="recommend" style="float:left">
+            <!--            在这里放推荐图像，如何是只浏览切片的，则不用管-->
+
+        </div>
+    </div>
+</template>
+
+<div id="slide_center">
+    <!--    <p>这里是slide center</p>-->
+    <ul class="nav slide nav-tabs nav-pills">
+        <li class="nav-item" id="all_slide_li">
+            <a class="nav-link active" id="all_slide_nav" href="#">所有切片</a>
+        </li>
+        <li class="nav-item" id="compute_slide_li">
+            <a class="nav-link" id="compute_slide_nav" href="#">计算切片</a>
+        </li>
+    </ul>
+    <div id="all_slide_block" class="all_slide_component">
+        <!--在这里添加所有切片的列表-->
+        <div id="all_slide_list">
+            <section>
+                <div class="data-container all_slide_component" style="overflow: scroll"></div>
+                <div id="pagination_all_slide" class="all_slide_component"></div>
+            </section>
+        </div>
+        <slide-viewer></slide-viewer>
+    </div>
+    <div id="compute_slide_block" class="disabled compute_slide_component">
+        <section>
+            <div class="data-container compute_slide_component" style="overflow: scroll"></div>
+            <div id="pagination_compute_slide" class="compute_slide_component"></div>
+        </section>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.9.0/viewer.min.js"></script>
+<script type="text/javascript" src="annotorious/annotorious.min.js"></script>
+<script src="paginationjs/dist/pagination-with-styles.js"></script>
+
+<script src="js/public.js"></script>
+<script src="js/slide/slide_viewer.js"></script>
+<script src="js/slide/slide_center.js"></script>
+</body>
+</html>

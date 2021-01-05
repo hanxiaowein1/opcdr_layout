@@ -1,0 +1,24 @@
+<template id="slideViewerTemplate">
+    <div>
+        <img class="image">
+        <div>
+        <!--有n个img-->
+            <ul>
+            </ul>
+        </div>
+    </div>
+
+</template>
+<script>
+    class SlideViewer extends HTMLElement{
+        constructor() {
+            super();
+            let templateElem = document.querySelector("#slideViewerTemplate")
+            let content = templateElem.content.cloneNode(true)
+            content.querySelector('img').setAttribute('src', this.getAttribute('image'))
+            this.appendChild(content)
+        }
+    }
+    window.customElements.define("slide-viewer", SlideViewer)
+
+</script>
