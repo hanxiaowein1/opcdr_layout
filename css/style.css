@@ -22,8 +22,16 @@ ul, li{
 li.elem_selected{
     background: #ce4541;
 }
-div.disabled{
+/*div.disabled{*/
+/*    display: none;*/
+/*}*/
+
+div.myHide{
     display: none;
+}
+
+button.disabled{
+    display:none;
 }
 /*img{*/
 /*    max-width:100%;*/

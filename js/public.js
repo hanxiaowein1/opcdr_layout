@@ -3,23 +3,6 @@ function replaceClass(elem, pre, pos){
     elem.classList.add(pos)
 }
 
-function changeDisplayStateByAid(id){
-    switch (id){
-        case 'sample_center_nav':
-            let sample_center = document.querySelector("#sample_center")
-            sample_center.classList.toggle("disabled")
-            break;
-        case 'model_center_nav':
-            let model_center = document.querySelector("#model_center")
-            model_center.classList.toggle("disabled")
-            break;
-        case 'train_center_nav':
-            let train_center = document.querySelector("#train_center")
-            train_center.classList.toggle("disabled")
-            break;
-    }
-}
-
 function getAllSiblings(e) {
     // for collecting siblings
     let siblings = [];
@@ -43,7 +26,9 @@ function getAllSiblings(e) {
 function setSiblingsDisabled(elem){
     siblings = getAllSiblings(elem)
     Array.from(siblings).forEach(function(sibling){
-        sibling.classList.add("disabled")
+        if(elem.tagName == sibling.tagName){
+            sibling.classList.add("disabled")
+        }
     })
 }
 
@@ -80,7 +65,6 @@ function navFuncByElem(elem){
             changeDisplayStateByAid(a_elem.id)//这里就可以使用MutationObserver监听
         }
     })
-
     //将当前li设置为选中
     let current_a_elem = elem.querySelector("a.disabled");
     if(current_a_elem == null)
@@ -101,7 +85,6 @@ function navFuncByElem(elem){
 function navFunc(event){
     return navFuncByElem(event.target)
 }
-
 
 function clickCallBack_Log(elem){
     console.log(elem.target.innerHTML)
@@ -152,7 +135,6 @@ function createPagination(name, content, click_callback){
     });
     return container;
 }
-
 
 function web2local(web_json){
     let local_json = {};
@@ -267,4 +249,20 @@ function createCanvas(elem, status){
     // let local_json = web2local_version(web_json);
     // anno.addAnnotation(local_json);
     //console.log('test')
+}
+
+function initSelect(id, data){
+    let pici_select = document.querySelector(id)
+    for(let i=0;i<data.length;i++){
+        let current = data[i]
+        let key = Object.keys(current)[0]
+        let value = current[key]
+        let option = document.createElement("option")
+        option.value = key
+        option.innerText = value
+        pici_select.appendChild(option)
+        // let elem = "<option value=\"" + key + "\">" + value + "</option>"
+        // pici_select.appendChild(elem)
+    }
+    $(id).dropdown()
 }

@@ -13,6 +13,3 @@ const train_list = document.querySelector("#train_list")
 const train_viewer = document.querySelector("#train_viewer")
 const train_adder = document.querySelector("#train_adder")
 
-const slide_center = document.querySelector("#slide_center")
-const all_slide_block = document.querySelector("#all_slide_block")
-const compute_slide_block = document.querySelector("#compute_slide_block")

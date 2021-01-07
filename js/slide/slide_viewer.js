@@ -5,12 +5,6 @@ async function getSlideCenter(url){
     } catch(e) { console.log(e); }
 }
 
-//const slide_center_html = await getSlideCenter('slide_center.html')
-// let slide_center_html
-// (async function(){
-//     slide_center_html = await getSlideCenter('slide_center.html')
-// })
-
 class SlideViewer extends HTMLElement{
     constructor() {
         super();
@@ -27,6 +21,16 @@ class SlideViewer extends HTMLElement{
             //this.original = this.innerHTML
             //console.log('test')
         }.bind(this))
+    }
+
+    /**
+     * 将其恢复到一开始的状态
+     */
+    clean(){
+        this.init_flag = false
+        let recommend = this.querySelector('div.recommend')
+        recommend.innerHTML = ''
+        this.querySelector("img.thumbnail").setAttribute('src', '')
     }
 
     initImg(){
