@@ -1,10 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+
 </head>
 <body>
-$END$
+<div>
+    <ul style="float:left">
+        <li>111</li>
+        <li>222</li>
+    </ul>
+
+
+<!--    <div class="ui form">-->
+<!--        <div class="fields">-->
+<!--            <div class="field disabled">-->
+<!--                <label>模型</label>-->
+<!--                <select class="ui search dropdown" name="modelname" id="modelname">-->
+<!--                    <option value="">Select Model</option>-->
+<!--                    <option value="resnet50">resnet50</option>-->
+<!--                    <option value="resnet101">resnet101</option>-->
+<!--                    <option value="yolo">yolo</option>-->
+<!--                    <option value="unet">unet</option>-->
+<!--                    <option value="faster-rcnn">faster-rcnn</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>模型名称</label>-->
+<!--                <input placeholder="模型名称" type="text" name="aliasname">-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>mpp</label>-->
+<!--                <input placeholder="mpp" type="text" name="dst_mpp">-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>大小</label>-->
+<!--                <input placeholder="size" type="text" name="dst_size">-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>空间变换</label>-->
+<!--                <select class="ui search dropdown" multiple="" name="spatial_augmentation" id="spatial_augmentation">-->
+<!--                    <option value="">Select Spatial</option>-->
+<!--                    <option value="Shift">平移</option>-->
+<!--                    <option value="Rotate">旋转</option>-->
+<!--                    <option value="Flip">Flip</option>-->
+<!--                    <option value="Scale">Scale</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>风格变换</label>-->
+<!--                <select class="ui search dropdown" multiple="" name="stylish_augmentation" id="stylish_augmentation">-->
+<!--                    <option value="">Select stylish</option>-->
+<!--                    <option value="HSV disturb">HSV disturb</option>-->
+<!--                    <option value="RGB switch">RGB switch</option>-->
+<!--                    <option value="Edge Gaussian Blur">Edge Gaussian Blur</option>-->
+<!--                    <option value="Sharp">Sharp</option>-->
+<!--                    <option value="Gamma adjust">Gamma adjust</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>normalization</label>-->
+<!--                <div class="two fields">-->
+<!--                    <div class="field">-->
+<!--                        <input type="text" placeholder="左界限" name="normalization_left">-->
+<!--                    </div>-->
+<!--                    <div class="field">-->
+<!--                        <input type="text" placeholder="右界限" name="normalization_right">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>optimizer</label>-->
+<!--                <select class="ui search dropdown" name="optimizer" id="optimizer">-->
+<!--                    <option value="">Select Optimizer</option>-->
+<!--                    <option value="sgd">sgd</option>-->
+<!--                    <option value="adam">adam</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>学习率</label>-->
+<!--                <input placeholder="学习率" type="text" name="learning_rate">-->
+<!--            </div>-->
+<!--            <div class="field disabled">-->
+<!--                <label>学习率计划</label>-->
+<!--                <select class="ui search dropdown" name="lr_scheduler" id="lr_scheduler">-->
+<!--                    <option value="">Select lr schedule</option>-->
+<!--                    <option value="cosine">cosine</option>-->
+<!--                    <option value="step">step</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+    <div>
+        <div class="ui form">
+            <div class="field">-->
+                <label>模型</label>
+                <select multiple="" class="ui search dropdown" name="modelname" id="modelname">
+                    <option value="">Select Model</option>
+                    <option value="resnet50">resnet50</option>
+                    <option value="resnet101">resnet101</option>
+                    <option value="yolo">yolo</option>
+                    <option value="unet">unet</option>
+                    <option value="faster-rcnn">faster-rcnn</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <button onclick="refresh()">刷新选择框</button>
+
+<!--    <div class="ui form" style="float:left">-->
+<!--        <div class="field">-->
+<!--            <label>学习率</label>-->
+<!--            <input placeholder="学习率" type="text" name="learnRate">-->
+<!--        </div>-->
+<!--        <div class="field">-->
+<!--            <label>optimizer</label>-->
+<!--            <select class="ui search dropdown" multiple="" name="optimizer" id="optimizer">-->
+<!--                <option value="">Select Optimizer</option>-->
+<!--                <option value="0">000</option>-->
+<!--                <option value="1">111</option>-->
+<!--            </select>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <button onclick="displayLearnRate()">点我</button>-->
+<!--    <button onclick="setOptimizer()">点我</button>-->
+<!--    <button onclick="setOptimizer2()">点我为空</button>-->
+<!--    <button onclick="setOptimizer3()">点我设置一个值</button>-->
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+<script>
+
+    $("#modelname").dropdown()
+    function refresh(){
+        $("#modelname").dropdown('restore defaults')
+    }
+
+    // $("#modelName").dropdown()
+    // $("#optimizer").dropdown()
+    // function displayLearnRate() {
+    //     let $form = $(".ui.form")
+    //     let learn_rate = $form.form('get value', 'learnRate')
+    //     console.log(learn_rate)
+    // }
+    // function setOptimizer(){
+    //     let $form = $(".ui.form")
+    //     $form.form('set value', 'optimizer', ['0', '1'])
+    //     //console.log($form.form('get value', 'optimizer'))
+    // }
+    // function setOptimizer2(){
+    //     let $form = $(".ui.form")
+    //     $form.form('set value', 'optimizer', [''])
+    //     //console.log($form.form('get value', 'optimizer'))
+    // }
+    // function setOptimizer3(){
+    //     let $form = $(".ui.form")
+    //     $form.form('set value', 'optimizer', ['0'])
+    //     //console.log($form.form('get value', 'optimizer'))
+    // }
+</script>
 </body>
 </html>

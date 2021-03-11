@@ -3,8 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <title>TrainCenter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
 
+<div id="train_shower" style="margin-top: 1%">
+    <!--训练列表-->
+    <div id="train_list" style="float:left;width:20%">
+        <h1 style="text-align: center">训练任务列表</h1>
+        <section>
+            <div class="data-container" style="overflow: scroll;"></div>
+            <div id="pagination_train"></div>
+        </section>
+        <div style="text-align: right;margin-top: 5%">
+            <button onclick="showAddTrainDiv(this)" class="ui button" >添加训练任务</button>
+        </div>
+    </div>
+
+    <!--训练进度-->
+    <div id="train-diagram" style="float:left;width:80%;margin-top: 1%">
+<!--        TODO:segment-ui似乎有问题，比如说就这里，正常情况这个div应该会放在train_list的右边，但是这里却覆盖了train_list的上半部分，使其
+TODO:无法被选择，-->
+        <div style="width:70%;margin: 0 auto;">
+            <!--    样本的详细信息-->
+            <div class="ui styled fluid accordion" id="sample_detail" style="width:100%;margin: 0 auto;">
+                <div class="title">
+                    <i class="dropdown icon"></i>
+                    样本信息
+                </div>
+                <div class="content">
+                    <div class="ui form">
+                        <div class="fields">
+                            <div class="inline field">
+                                <label>样本</label>
+                                <input placeholder="样本名称" type="text" id="111">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui styled fluid accordion" id="model_detail">
+                <div class="title">
+                    <i class="dropdown icon"></i>
+                    模型信息
+                </div>
+                <div class="content">
+                    <div class="ui form">
+                        <div class="inline fields">
+                            <div class="field">
+                                <label>模型</label>
+                                <input placeholder="模型名称" type="text" id="model">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--    学习曲线-->
+            <div class="ui styled fluid accordion" id="train_detail">
+                <div class="title">
+                    <i class="dropdown icon"></i>
+                    训练信息
+                </div>
+                <div class="content">
+                    <div id="diagram-container1" style="width: 600px;height:400px;text-align: center"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="ui modal" style="height: auto; top: auto; left: auto; bottom: auto; right: auto;" id="add_train_div">
+    <i class="close icon"></i>
+    <div class="header">
+        添加训练任务
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="fields">
+                <div class="field">
+                    <label>样本</label>
+                    <select class="ui search dropdown" id="sample_select">
+                        <option value="">Select Sample</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>模型</label>
+                    <select class="ui search dropdown" id="model_select">
+                        <option value="">Select Model</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>样本</label>
+                    <input placeholder="样本名称" type="text" id="train_name">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<!--<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js" integrity="sha512-WNLxfP/8cVYL9sj8Jnp6et0BkubLP31jhTG9vhL/F5uEZmg5wEzKoXp1kJslzPQWwPT1eyMiSxlKCgzHLOTOTQ==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script src="paginationjs/dist/pagination-with-styles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+
+<script src="js/public.js"></script>
+<script src="js/train/train_center.js"></script>
 </body>
 </html>

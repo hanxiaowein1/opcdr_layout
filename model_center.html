@@ -6,81 +6,67 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <link rel="stylesheet" href="css/style.css"/>
-    <style>
-        div.overall > div{
-            float:left;
-        }
-        #addModel{
-            z-index:9;
-        }
-    </style>
 </head>
 <body>
-<template id="modelViewerTemplate">
-    <!--    显示模型的属性-->
-    <div class="ui form">
-        <div class="two fields model_detail">
-            <div class="field">
-                <label>模型名</label>
-                <select class="ui search dropdown" id="modelName">
-                    <option value="">Select Model</option>
-                </select>
+
+<div class="overall" style="margin-top: 1%">
+    <div id="model_shower">
+        <div id="model_list" style="float:left;width:20%;">
+            <h1 style="text-align: center">模型配置列表</h1>
+            <section>
+                <div class="data-container" style="overflow: scroll"></div>
+                <div id="pagination_model"></div>
+            </section>
+            <div style="text-align: right;margin-top: 5%">
+                <button onclick="openAddModel()" class="ui button">添加模型</button>
             </div>
-            <div class="field">
-                <label>学习率</label>
-                <input placeholder="Read Only" type="text" id="learnRate">
-            </div>
-            <div class="field">
-                <label>batchsize</label>
-                <input placeholder="Read Only" type="text" id="batchsize">
-            </div>
-            <div class="field">
-                <label>optimizer</label>
-                <select class="ui search dropdown" id="optimizer">
-                    <option value="">Select Optimizer</option>
-                </select>
+        </div>
+
+        <div id="model_viewer" class="myHide" style="float:left;width:80%;">
+            <div style="width:40%;margin: 0 auto;">
+                <model-viewer id="viewer1"></model-viewer>
+
+                <div id="modifyDiv1" style="text-align: right">
+                    <button onclick="modifyModelDetail(this)" class="ui button" id="modifyButton">修改</button>
+                </div>
+                <div class="myHide" id="modifyDiv2" style="text-align: right">
+                    <button onclick="saveModify()" class="ui primary button">保存</button>
+                    <button onclick="discardModify(this)" class="ui button">丢弃</button>
+                </div>
             </div>
         </div>
     </div>
-</template>
-
-
-<div class="overall">
-    <div id="model_list">
-        <section>
-            <div class="data-container" style="overflow: scroll;width:200px"></div>
-            <div id="pagination_model"></div>
-        </section>
-        <button onclick="openAddModel()" class="ui button">添加模型</button>
     </div>
 
-    <div id="model_viewer" class="myHide">
-        <model-viewer id="viewer1"></model-viewer>
-        <div class="myHide" id="modifyDiv1">
-            <button onclick="modifyModelDetail(this)" class="ui button" id="modifyButton">修改</button>
-        </div>
-        <div class="myHide" id="modifyDiv2">
-            <button onclick="saveModify()" class="ui primary button">保存</button>
-            <button onclick="discardModify(this)" class="ui button">丢弃</button>
-        </div>
-    </div>
+</div>
 
-    <div id="addModel" class="myHide">
+<div class="ui modal" style="height: auto; top: auto; left: auto; bottom: auto; right: auto;" id="addModel">
+    <i class="close icon"></i>
+    <div class="header">
+        添加模型
+    </div>
+    <div class="content">
         <model-viewer id="viewer2"></model-viewer>
-        <button onclick="submitModel()" class="ui primary button">提交</button>
-        <button onclick="returnModel()" class="ui button">返回</button>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
     </div>
 </div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 <script src="paginationjs/dist/pagination-with-styles.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
 
-
 <script src="js/public.js"></script>
 <script src="js/model/model_center.js"></script>
+
 </body>
 </html>

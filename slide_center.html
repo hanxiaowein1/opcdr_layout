@@ -9,19 +9,10 @@
     <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
     <link href="annotorious/annotorious.min.css" rel="stylesheet">
     <style>
-        #all_slide_block > div{
-            display:inline-block;
-            float: left;
-        }
-        #compute_slide_block>div{
-            display:inline-block;
-            float: left;
-        }
-        div.slide_query > div{
-            float:left
-        }
+        /*#compute_slide_block > div{*/
+        /*    float: left;*/
+        /*}*/
         /*div.recommend{*/
-        /*    display:inline-block;*/
         /*    float: left;*/
         /*}*/
     </style>
@@ -29,96 +20,122 @@
 </head>
 <body>
 <template id="slideViewerTemplate">
-    <div>
-        <div>
+    <style>
+        img.status{
+            height: 30px;
+            width:30px;
+        }
+        img.ceil{
+            height:150px;
+            width:150px;
+        }
+        div.recommend > div{
+            float:left;
+            padding:15px;
+        }
+        div.status{
+            clear:left;
+            text-align: center;
+        }
+        img.thumbnail{
+            height:500px;
+            width:500px;
+        }
+    </style>
+    <div style="text-align: center">
+        <div style="text-align: center">
             <ul class="thumbnail_ul">
-                <img width="500" height="500" class="thumbnail">
+                <img class="thumbnail">
             </ul>
         </div>
-        <div class="recommend" style="display:inline-block;float:left;">
+        <div class="recommend" style="display:inline-block">
             <!--            在这里放推荐图像，如何是只浏览切片的，则不用管-->
         </div>
     </div>
 </template>
 
-<!--    <p>这里是slide center</p>-->
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="all-slide-tab" data-toggle="tab" href="#all_slide_block" role="tab" aria-controls="home" aria-selected="true">全切片</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a class="nav-link" id="compute-slide-tab" data-toggle="tab" href="#compute_slide_block" role="tab" aria-controls="profile" aria-selected="false">计算切片</a>
-    </li>
-</ul>
+<div id="train_list" style="width:20%;margin-top: 1%">
+    <h1 style="text-align: center">前向模型列表</h1>
+    <section>
+        <div class="data-container compute_slide_component" style="overflow: scroll"></div>
+        <div id="pagination_train" class="compute_slide_component"></div>
+    </section>
+</div>
 
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active all_slide_component" id="all_slide_block" role="tabpanel" aria-labelledby="all-slide-tab">
-        <div id="all_slide_list">
-            <section>
-                <div class="data-container all_slide_component" style="overflow: scroll"></div>
-                <div id="pagination_all_slide" class="all_slide_component"></div>
-            </section>
-        </div>
-        <slide-viewer id="all_slide_viewer"></slide-viewer>
-
-        <div class="slide_query">
-<!--            选择切片的批次和阴阳性，然后点击按钮查询到有多少张切片-->
-            <div class="ui form">
-                <div class="field">
-                    <label>批次</label>
-                    <select multiple="" class="ui search dropdown" id="pici_select">
-                        <option value="">Select Batch</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="ui form">
-                <div class="field">
-                    <label>类型</label>
-                    <select multiple="" class="ui search dropdown" id="type_select">
-                        <option value="">Select Type</option>
-                    </select>
-                </div>
-            </div>
-            <div><button onclick="getSelectedData()">查询</button></div>
-
-        </div>
-
-        <div class="slide_selector myHide">
-            <div class="ui form">
-                <div class="field">
-                    <label>选择切片</label>
-                    <select multiple="" class="ui dropdown" id="slide_select">
-                        <option value="">Select Slide</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="ui form">
-                <div class="field">
-                    <label>选择模型</label>
-                    <select class="ui search dropdown" id="model_select">
-                        <option value="">Select Model</option>
-                    </select>
-                </div>
-            </div>
-            <button onclick="addSlide()">添加切片</button>
-        </div>
-
-    </div>
-    <div class="tab-pane fade compute_slide_component" id="compute_slide_block" role="tabpanel" aria-labelledby="compute-slide-tab">
-        <div id="compute_slide_list">
+<div id="compute_slide_block" class="myHide" style="width:100%;margin-top: 1%">
+    <div id="compute_shower">
+        <div id="compute_slide_list" style="width:20%;float:left">
+            <h1 style="text-align: center">推荐切片列表</h1>
             <section>
                 <div class="data-container compute_slide_component" style="overflow: scroll"></div>
                 <div id="pagination_compute_slide" class="compute_slide_component"></div>
             </section>
+            <div style="text-align: right;margin-top: 5%">
+                <button onclick="return2ModelList(this)" class="ui button">返回模型列表</button>
+                <button onclick="addSlide(this)" class="ui button">添加计算切片</button>
+            </div>
         </div>
-        <slide-viewer id="compute_slide_viewer"></slide-viewer>
+        <div style="margin: 0 auto;width:80%;margin-top: 2%">
+            <slide-viewer id="compute_slide_viewer"></slide-viewer>
+        </div>
+
     </div>
 </div>
 
+<div class="ui modal" id="add_slide_div" style="height: auto; top: auto; left: auto; bottom: auto; right: auto;">
+    <!--        TODO:这里的style添加上float:left就无法选择下拉框了，以后需要排查为什么-->
+    <i class="close icon"></i>
+    <div class="header">
+        添加计算任务
+    </div>
+    <div class="content">
+        <div id="query_slide_div">
+            <slide-query></slide-query>
+            <button onclick="querySlide()" class="ui button">查询</button>
+        </div>
+        <div id="refreshSlideSelectDiv" style="text-align: left;">
+            <div class="ui form">
+                <div class="fields">
+                    <div class="field">
+                        <label>切片</label>
+                        <select multiple="" class="ui search dropdown" id="slide_select" name="slide_select">
+                            <option value="">Select Slide</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+
+    <!--        <div id="refreshSlideSelectDiv" style="text-align: left;">-->
+    <!--            <div class="ui form">-->
+    <!--                <div class="fields">-->
+    <!--                    <div class="field">-->
+    <!--                        <label>切片</label>-->
+    <!--                        <select multiple="" class="ui search dropdown" id="slide_select">-->
+    <!--                            <option value="">Select Slide</option>-->
+    <!--                        </select>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div style="clear:left">-->
+    <!--                <button onclick="uploadComputeSlide()" class="ui primary button">提交</button>-->
+    <!--                <button onclick="cancel()" class="ui button">取消</button>-->
+    <!--            </div>-->
+    <!--        </div>-->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.9.0/viewer.min.js"></script>
@@ -129,6 +146,6 @@
 <script src="js/public.js"></script>
 <script src="js/slide/slide_viewer.js"></script>
 <script src="js/slide/slide_center.js"></script>
-
+<script src="js/slide/slide_query.js"></script>
 </body>
 </html>

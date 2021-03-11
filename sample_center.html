@@ -3,8 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <title>SampleCenter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+    <link href="annotorious/annotorious.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
 
+<div id="dataset_list" style="margin-top:1%;text-align: center">
+    <h1 style="text-align: center">数据集列表</h1>
+    <section>
+        <div class="data-container" ></div>
+        <div id="pagination_dataset"></div>
+    </section>
+    <div>
+        <button onclick="addDataSet(this)" class="ui button">添加数据集</button>
+    </div>
+
+</div>
+
+<div id="sample_div" class='myHide' style="margin-top:1%;width:100%">
+    <div id="sample_list" style="width:20%;float:left">
+        <h1 style="text-align: center">样本列表</h1>
+        <section>
+            <div class="data-container"></div>
+            <div id="pagination_sample"></div>
+        </section>
+        <div>
+            <button onclick="return2DataSetList(this)" class="ui button">返回</button>
+            <button onclick="addSample(this)" class="ui button">添加样本</button>
+            <button onclick="addExistSample(this)" class="ui button">添加现有样本</button>
+        </div>
+    </div>
+    <div style="width:80%;float:left" id="sample_shower1">
+        <div style="width:20%;margin: 0 auto">
+            <!--    展示样本的配置-->
+            <slide-query id="slide_query1"></slide-query>
+            <anno-query id="anno_query1"></anno-query>
+            <sample-info></sample-info>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="addDataSetDiv" class="ui modal" style="height: auto; top: auto; left: auto; bottom: auto; right: auto;">
+    <i class="close icon"></i>
+    <div class="header">
+        添加样本
+    </div>
+    <div class="content">
+<!--        添加数据集只需添加别名即可-->
+        <div class="ui form">
+            <div class="field">
+                <label>名称</label>
+                <input placeholder="数据集名称" type="text" name="aliasname">
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div id="addSampleDiv" class="ui modal" style="height: auto; top: auto; left: auto; bottom: auto; right: auto;">
+    <i class="close icon"></i>
+    <div class="header">
+        添加样本
+    </div>
+    <div class="content">
+        <slide-query id="slide_query2"></slide-query>
+        <anno-query id="anno_query2"></anno-query>
+        <button onclick="querySlideCount(this)" class="ui button">查询切片数量</button>
+        <button onclick="queryAnnoCount(this)" class="ui button">查询标注数量</button>
+        <div id="queryResultDiv">
+<!--            查询的信息-->
+            <sample-info></sample-info>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div id="addExistSampleDiv" class="ui modal" style="height: 500px; top: auto; left: auto; bottom: auto; right: auto;">
+    <i class="close icon"></i>
+    <div class="header">
+        添加样本
+    </div>
+    <div class="content">
+        <!--        添加数据集只需添加别名即可-->
+        <div class="ui form">
+            <div class="field">
+                <label>样本名称</label>
+                <select multiple="" class="ui search dropdown" id="sample_select" name="sampleconfigids">
+                    <option value="">Select sample method</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            取消
+        </div>
+        <div class="ui positive right labeled icon button">
+            提交
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script src="paginationjs/dist/pagination-with-styles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src = 'js/public.js'></script>
+<script src = 'js/sample/sample_center.js'></script>
+<script src="js/slide/slide_query.js"></script>
+<script src="js/sample/anno_query.js"></script>
+<script src="js/sample/sample_info.js"></script>
 </body>
 </html>

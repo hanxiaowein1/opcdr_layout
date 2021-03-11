@@ -1,10 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <style>
+        /*div.data-container::-webkit-scrollbar{*/
+        /*    display:none*/
+        /*}*/
+        div.data-container{
+            overflow:hidden
+        }
+        div.data-container:hover{
+            overflow:scroll
+        }
+
+        div.data-container tr.elem_selected{
+            color : #ff0000
+            /*background-color: #ff0000;*/
+        }
+
+        div.data-container tr.pagination_tr_style1{
+            background-color: #F2F2F2;
+        }
+
+        div.data-container tr.pagination_tr_style2{
+            background-color: #ffffff;
+        }
+
+        .ui.table thead tr:first-child > th {
+            position: sticky !important;
+            top: 0;
+            z-index: 2;
+        }
+
+
+
+        /*div.data-container:hover{*/
+        /*    overflow:scroll*/
+        /*}*/
+    </style>
 </head>
 <body>
-$END$
+
+
+
+<!--<table class="ui selectable single line table" style="width:20%;text-align: center;margin: 0 auto;">-->
+<!--    <tr>-->
+<!--        <td>空间</td>-->
+<!--        <td>空间</td>-->
+<!--        <td>空间</td>-->
+<!--    </tr>-->
+<!--</table>-->
+<!--<table class="ui selectable single line table" style="width:20%;text-align: center;margin: 0 auto">-->
+<!--    <tr>-->
+<!--        <td>空间2</td>-->
+<!--        <td>空间2</td>-->
+<!--        <td>空间2</td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+<!--pagination人家也没有一定要使用列表作为每一页的分页元素啊。。。-->
+<section style="width:20%;text-align: center;margin: 0 auto">
+    <div class="data-container compute_slide_component" style="height: 400px"></div>
+    <div id="pagination_compute_slide" class="compute_slide_component"></div>
+</section>
+
+<button onclick="createPaginationTable()">点击我</button>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="../paginationjs/dist/pagination-with-styles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script>
+    function getData(){
+        let result = []
+        for(let i = 0;i<100;i++){
+            result.push(i)
+        }
+        return result;
+    }
+
+    function changeTableRowSelected(event){
+        //let parent_elem = event.target.parentElement
+        let parent_elem = event.target.closest('tbody')
+        let selected_elems = parent_elem.querySelectorAll('tr.elem_selected')
+        Array.from(selected_elems).forEach(function(selected_elem){
+            selected_elem.classList.remove("elem_selected")
+        })
+        event.target.closest('tr').classList.add('elem_selected')
+        return event
+    }
+
+    function createPaginationTable(){
+        let container = $('#pagination_compute_slide')
+
+        let sources = getData()
+        let options = {
+            dataSource: sources,
+            pageSize: 10,
+            locator:'items',
+            showGoInput: true,
+            showPageNumbers: false,
+            showNavigator: true,
+            showGoButton: true,
+            callback:function(response, pagination){
+                let dataHtml = document.createElement('table')
+               // dataHtml.classList.add('ui cell table')
+                dataHtml.classList.add('ui')
+               // dataHtml.classList.add('cell')
+                //dataHtml.classList.add('selectable')
+                dataHtml.classList.add('single')
+                dataHtml.classList.add('line')
+                dataHtml.classList.add('table')
+
+                let thead = document.createElement('thead')
+                let tr = document.createElement('tr')
+                let th = document.createElement('th')
+                th.innerHTML = '标题'
+                tr.appendChild(th)
+                thead.appendChild(tr)
+                dataHtml.appendChild(thead)
+
+                let tbody = document.createElement('tbody')
+                $.each(response, function(index, item){
+                    let tr = document.createElement('tr')
+                    if(index % 2 ==0){
+                        tr.classList.add('pagination_tr_style1')
+                    }else{
+                        tr.classList.add('pagination_tr_style2')
+                    }
+                    let td = document.createElement('td')
+                    td.innerHTML = item
+                    tr.appendChild(td)
+                    tbody.appendChild(tr)
+                })
+                dataHtml.appendChild(tbody)
+                container.prev().html(dataHtml.outerHTML)
+
+                let normal_container = container.get(0)
+                let table_rows = normal_container.parentElement.querySelectorAll('div.data-container tbody tr')
+                Array.from(table_rows).forEach(function(row){
+                    row.addEventListener('click', function(event){
+                        console.log('111')
+                    })
+                    row.addEventListener('click', changeTableRowSelected)
+                })
+            }
+        }
+
+        container.addHook('beforeInit', function(){
+            window.console && console.log('beforeInit...');
+        });
+        container.pagination(options);
+        container.addHook('beforePageOnClick', function(){
+            window.console && console.log('beforePageOnClick...');
+        });
+        return container;
+
+    }
+</script>
 </body>
 </html>
