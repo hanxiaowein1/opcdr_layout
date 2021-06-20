@@ -31,36 +31,38 @@ TODO:无法被选择，-->
             <div class="ui styled fluid accordion" id="sample_detail" style="width:100%;margin: 0 auto;">
                 <div class="title">
                     <i class="dropdown icon"></i>
-                    样本信息
+                    训练参数信息
                 </div>
                 <div class="content">
-                    <div class="ui form">
-                        <div class="fields">
-                            <div class="inline field">
-                                <label>样本</label>
-                                <input placeholder="样本名称" type="text" id="111">
-                            </div>
-                        </div>
-                    </div>
+                    <train-adder id="train_adder1"></train-adder>
+
+<!--                    <div class="ui form">-->
+<!--                        <div class="fields">-->
+<!--                            <div class="inline field">-->
+<!--                                <label>样本</label>-->
+<!--                                <input placeholder="样本名称" type="text" id="111">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
                 </div>
             </div>
 
-            <div class="ui styled fluid accordion" id="model_detail">
-                <div class="title">
-                    <i class="dropdown icon"></i>
-                    模型信息
-                </div>
-                <div class="content">
-                    <div class="ui form">
-                        <div class="inline fields">
-                            <div class="field">
-                                <label>模型</label>
-                                <input placeholder="模型名称" type="text" id="model">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!--            <div class="ui styled fluid accordion" id="model_detail">-->
+<!--                <div class="title">-->
+<!--                    <i class="dropdown icon"></i>-->
+<!--                    模型信息-->
+<!--                </div>-->
+<!--                <div class="content">-->
+<!--                    <div class="ui form">-->
+<!--                        <div class="inline fields">-->
+<!--                            <div class="field">-->
+<!--                                <label>模型</label>-->
+<!--                                <input placeholder="模型名称" type="text" id="model">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
             <!--    学习曲线-->
             <div class="ui styled fluid accordion" id="train_detail">
                 <div class="title">
@@ -68,7 +70,11 @@ TODO:无法被选择，-->
                     训练信息
                 </div>
                 <div class="content">
+                    <div>
+                        <button class="ui button" onclick="startTrain(this)">开始训练</button>
+                    </div>
                     <div id="diagram-container1" style="width: 600px;height:400px;text-align: center"></div>
+                    <div id="diagram-container2" style="width: 600px;height:400px;text-align: center"></div>
                 </div>
             </div>
         </div>
@@ -82,26 +88,7 @@ TODO:无法被选择，-->
         添加训练任务
     </div>
     <div class="content">
-        <div class="ui form">
-            <div class="fields">
-                <div class="field">
-                    <label>样本</label>
-                    <select class="ui search dropdown" id="sample_select">
-                        <option value="">Select Sample</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>模型</label>
-                    <select class="ui search dropdown" id="model_select">
-                        <option value="">Select Model</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>样本</label>
-                    <input placeholder="样本名称" type="text" id="train_name">
-                </div>
-            </div>
-        </div>
+        <train-adder id="train_adder2"></train-adder>
     </div>
     <div class="actions">
         <div class="ui black deny button">
@@ -123,6 +110,10 @@ TODO:无法被选择，-->
 <script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
 
 <script src="js/public.js"></script>
+<script src="js/server_interface/train_interface.js"></script>
+<script src="js/server_interface/sample_interface.js"></script>
+<script src="js/server_interface/model_interface.js"></script>
+<script src="js/train/train_adder.js"></script>
 <script src="js/train/train_center.js"></script>
 </body>
 </html>

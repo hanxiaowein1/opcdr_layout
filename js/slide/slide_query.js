@@ -1,3 +1,6 @@
+/**
+ * 切片属性表单集合类
+ */
 class SlideQuery extends HTMLElement{
     constructor() {
         super()
@@ -17,6 +20,8 @@ class SlideQuery extends HTMLElement{
 
             this.appendChild(content)
 
+            this.fields = ["slide_group", "slide_format", "pro_method", "image_method", "zoom", "is_positive"]
+
         }.bind(this))
     }
 
@@ -33,21 +38,121 @@ class SlideQuery extends HTMLElement{
         }).then(function (response){
             return response.json()
         }).then(function(json_data){
-            let slide_group = getFormatSelectData(json_data['data']['result']['slide_group'])
-            let pro_method = getFormatSelectData(json_data['data']['result']['pro_method'])
-            let image_method = getFormatSelectData(json_data['data']['result']['image_method'])
-            let zoom = getFormatSelectData(json_data['data']['result']['zoom'])
-            let is_positive = getFormatSelectData(json_data['data']['result']['is_positive'])
-            let slide_format = getFormatSelectData(json_data['data']['result']['slide_format'])
+            //要手动把options给加上去
+            Array.from(this.fields).forEach(function(elem){
+                let temp_data = this.getFormatSelectData(json_data['data']['result'][elem])
+                this.addOptions(temp_data, this.id_prefix + elem + "_select")
+            }.bind(this))
 
-            //为切片选择添加选项
-            initSelect("#" + this.id_prefix + 'slide_group_select', slide_group)
-            initSelect("#" + this.id_prefix + 'slide_format_select', slide_format)
-            initSelect("#" + this.id_prefix + 'pro_method_select', pro_method)
-            initSelect("#" + this.id_prefix + 'image_method_select', image_method)
-            initSelect("#" + this.id_prefix + 'zoom_select', zoom)
-            initSelect("#" + this.id_prefix + 'is_positive_select', is_positive)
+            /**
+             * 为slide_group添加回调函数。例如在slide_group中选择sfy1时，会重新加载其他的切片属性下拉框，例如拍摄方式等下拉框。
+             * 其他下拉框会根据slide_group中选择的切片来源，来初始化下拉框中可选择的选项。
+             * 例如如果sfy1只有non-bd的拍摄方式，在选择sfy1是，拍摄方式下拉框中仅可以选择non-bd
+             */
+            Array.from(this.fields).forEach(function(elem){
+                if(elem == "slide_group"){
+                    $('#' + this.id_prefix + elem + '_select').dropdown({
+                        values : this.getFormatSelectData(json_data['data']['result'][elem]),
+                        onAdd : function(value, text, $choice){
+                            let data = this.getValues()
+                            data[elem].push(value)
+                            delete data['slide_category']
+                            getSlidesFieldsCondition(data).then(function(json_data){
+                                let result = json_data['data']['result']
+                                this.updateSelect(result, elem)
+                            }.bind(this))
+                        }.bind(this),
+                        onRemove : function(value, text, $choice){
+                            let data = this.getValues()
+                            let index = data[elem].indexOf(value)
+                            if(index > -1){
+                                data[elem].splice(index, 1)
+                            }
+                            delete data['slide_category']
+                            getSlidesFieldsCondition(data).then(function(json_data){
+                                let result = json_data['data']['result']
+                                this.updateSelect(result, elem)
+                            }.bind(this))
+                        }.bind(this)
+                    })
+                }
+                else{
+                    $('#' + this.id_prefix + elem + '_select').dropdown({
+                            values : this.getFormatSelectData(json_data['data']['result'][elem])
+                        }
+                    )
+                }
+
+            }.bind(this))
             initSelect("#" + this.id_prefix + 'slide_category', [])
+        }.bind(this))
+    }
+
+    /**
+     * 将data转换为符合初始化semantic-ui dropdown控件的数据格式
+     * @param data
+     * @returns {*[]}
+     */
+    getFormatSelectData(data){
+        let ret = []
+        Array.from(data).forEach(function(elem){
+            let temp_data = {}
+            temp_data['name'] = elem
+            temp_data['value'] = elem
+            ret.push(temp_data)
+        })
+        return ret
+    }
+
+    /**
+     * 为select控件添加options
+     * @param data
+     * @param id
+     */
+    addOptions(data, id){
+        let select = this.querySelector('#' + id)
+        for(let i = 0;i<data.length;i++){
+            let option = document.createElement('option')
+            option.setAttribute('value', data[i]['value'])
+            option.innerText = data[i]['name']
+            select.appendChild(option)
+        }
+    }
+
+    /**
+     * 清楚<select>元素下的所有options
+     * @param id
+     */
+    clearOptions(id){
+        let select = this.querySelector('#' + id)
+        let length = select.options.length;
+        for (let i = length-1; i >= 0; i--) {
+            select.options[i] = null;
+        }
+    }
+
+    /**
+     * 清空下拉框的选择栏目，更改下拉框的选项
+     * @param data
+     * @param select
+     */
+    updateSelect(data, select){
+        Array.from(this.fields).forEach(function(elem){
+            if(elem == select){
+                return
+            }
+            let temp_data = this.getFormatSelectData(data[elem])
+            $('#' + this.id_prefix + elem + "_select").dropdown(
+                'setup menu', {
+                    values : temp_data
+                }
+            )
+            //在setup menu后，还需要clear选项
+            $('#' + this.id_prefix + elem + "_select").dropdown('clear')
+            //先clearoption，在addoption
+            this.clearOptions(this.id_prefix + elem + "_select")
+            //addoption
+            this.addOptions(temp_data, this.id_prefix + elem + "_select")
         }.bind(this))
     }
 

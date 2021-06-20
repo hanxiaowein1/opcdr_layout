@@ -1,6 +1,10 @@
-class ModelViewer extends HTMLElement{
+/**
+ * 模型属性的查看器（利用表单元素进行查看）
+ */
+class ModelViewer extends SelectBase{
     constructor(){
         super()
+        console.log("ModelViewer construct")
         fetch('template.html').then(function(response){
             return response.text()
         }).then(function(text){
@@ -12,37 +16,31 @@ class ModelViewer extends HTMLElement{
             this.id_prefix = this.getAttribute('id')
             //将内部的那些id都加上前缀
 
-            let multiSelectors = content.querySelectorAll(".ui.dropdown")
-            Array.from(multiSelectors).forEach(function(elem){
-                elem.id = this.id_prefix + elem.id
-            }.bind(this))
-
+            // let multiSelectors = content.querySelectorAll(".ui.dropdown")
+            // Array.from(multiSelectors).forEach(function(elem){
+            //     elem.id = this.id_prefix + elem.id
+            // }.bind(this))
+            content = this.setSpecialId(content)
             this.appendChild(content)
-            this.initModel([])
-            this.initSpatial([])
-            this.initStylish([])
-            this.initOptimizer([])
-            this.initLrScheduler([])
+
+            this.init()
         }.bind(this))
 
     }
 
     /**
-     * 检查表单是否有空
+     * 初始化下拉框
      */
-    existEmpty(){
-        //let $form = $(".ui.form")
-        let $form = $(this).children(".ui.form")
-        let values = $form.form('get values')
-        for(let key in values){
-            let attrName = key
-            let attrValue = values[key]
-            if(attrValue == '' || attrValue.length == 0)
-                return true
-        }
-        return false
+    init(){
+        // initSelect("#" + this.id_prefix + 'modelname', [])
+        // initSelect("#" + this.id_prefix + 'aliasname', [])
+        this.initSelect('modelname', [])
+        this.initSelect('aliasname', [])
     }
 
+    /**
+     * 设置下拉框可编辑
+     */
     setEditable(){
         let elems = this.querySelectorAll("div.field")
         Array.from(elems).forEach(function(elem){
@@ -50,15 +48,14 @@ class ModelViewer extends HTMLElement{
         })
     }
 
+    /**
+     * 是下拉框不可编辑
+     */
     removeEditable(){
         let elems = this.querySelectorAll("div.field")
         Array.from(elems).forEach(function(elem){
             elem.classList.add("disabled")
         })
-    }
-
-    getRealId(id){
-        return '#' + this.id_prefix + id
     }
 
     getValue(key){
@@ -67,85 +64,12 @@ class ModelViewer extends HTMLElement{
         let value = $form.form('get value', key)
         return value
     }
-    getValues(){
-        //let $form = $('.ui.form')
-        let $form = $(this).children(".ui.form")
-        let values = $form.form('get values')
-        return values
 
-    }
     getModelName(){
         return this.getValue("modelname")
     }
     getAliasName(){
         return this.getValue("aliasname")
-    }
-    getMpp(){
-        return this.getValue("dst_mpp")
-    }
-    getSize(){
-        return this.getValue("dst_size")
-    }
-    getSpatial(){
-        return this.getValue("spatial_augmentation")
-    }
-    getStylish(){
-        return this.getValue("stylish_augmentation")
-    }
-    getNormalization(){
-        let left = this.getValue("normalization_left")
-        let right = this.getValue("normalization_right")
-        return [left, right]
-    }
-    getOptimizer(){
-        return this.getValue("optimizer")
-    }
-    getLearnRate(){
-        return this.getValue("learning_rate")
-    }
-    getLrScheduler(){
-        return this.getValue("lr_scheduler")
-    }
-
-    setValue(key, value){
-        //let $form = $('.ui.form')
-        let $form = $(this).children(".ui.form")
-        //最新测试：dropdown以及select都可以通过该方法赋值（NB!!）
-        $form.form('set value', key, value)
-    }
-
-    //其中key是name
-    setValues(data){
-        let $form = $(this).children(".ui.form")
-        let keys = this.getKeys()
-        for(let key in data){
-            let value = data[key]
-            if(keys.includes(key)){
-                $form.form('set value', key, value)
-            }
-        }
-    }
-
-    getIds(){
-        let ret = []
-        let select_elems = this.querySelectorAll('select')
-        Array.from(select_elems).forEach(function(select_elem){
-            ret.push(select_elem.getAttribute('id'))
-        })
-        return ret
-    }
-
-    getKeys(){
-        let ret = []
-        let select_elems = this.querySelectorAll('select')
-        Array.from(select_elems).forEach(function(select_elem){
-            ret.push(select_elem.getAttribute('name'))
-        })
-        let select_elems2 = this.querySelectorAll('input')
-        Array.from(select_elems2).forEach(function(select_elem){
-            ret.push(select_elem.getAttribute('name'))
-        })
-        return ret
     }
 
     setModelName(data){
@@ -154,31 +78,7 @@ class ModelViewer extends HTMLElement{
     setAliasName(data){
         this.setValue("aliasname", data)
     }
-    setMpp(data){
-        this.setValue("dst_mpp", data)
-    }
-    setSize(data){
-        this.setValue("dst_size", data)
-    }
-    setSpatial(data){
-        this.setValue("spatial_augmentation", data)
-    }
-    setStylish(data){
-        this.setValue("stylish_augmentation", data)
-    }
-    setNormalization(data){
-        this.setValue("normalization_left", data[0])
-        this.setValue("normalization_right", data[1])
-    }
-    setOptimizer(data){
-        this.setValue("optimizer", data)
-    }
-    setLearnRate(data){
-        this.setValue("learning_rate", data)
-    }
-    setLrScheduler(data){
-        this.setValue("lr_scheduler", data)
-    }
+
     /**
      * 设置模型的名称
      * @param data:有哪些模型可以选择
@@ -188,39 +88,11 @@ class ModelViewer extends HTMLElement{
         initSelect(modelId, data)
     }
 
-    initOptimizer(data){
-        let optimizerId = this.getRealId("optimizer")
-        initSelect(optimizerId, data)
-    }
-
-    initLrScheduler(data){
-        let lrSchedulerId = this.getRealId("lr_scheduler")
-        initSelect(lrSchedulerId, data)
-    }
-
-    initSpatial(data){
-        let spatialId = this.getRealId("spatial_augmentation")
-        initSelect(spatialId, data)
-    }
-
-    initStylish(data){
-        let stylishId = this.getRealId("stylish_augmentation")
-        initSelect(stylishId, data)
-    }
-
-    restoreDefaults(){
-        let ids = this.getIds()
-        for(let i = 0;i<ids.length;i++){
-            $('#' + ids[i]).dropdown('restore defaults')
-        }
-    }
 }
 
 window.customElements.define("model-viewer", ModelViewer)
 
-
-
-//初始化nav_bar
+//初始化导航栏
 fetch('nav_bar.html').then(function(response){
     return response.text()
 }).then(function(text){
@@ -245,6 +117,9 @@ function convertLocal2Web(data){
 
 let model_list = []
 
+/**
+ * 初始化模型列表
+ */
 function loadModelList(){
     fetch(serverurl + "/model/listconfig").then(function(response){
         return response.json()
@@ -254,56 +129,58 @@ function loadModelList(){
         model_list = data
 
         let name = "pagination_model"
-        //let callback = displayModelDetail
         let callback = function(event){
             let model_viewer = document.querySelector('#model_viewer')
             if(model_viewer.classList.contains('myHide')){
                 model_viewer.classList.remove('myHide')
             }
-            let current_li = event.target
+            let current_tr = event.target.closest('tr')
+            let model_id = current_tr.getAttribute('id')
             let viewer1 = document.querySelector('#viewer1')
             //先restore一下
             viewer1.restoreDefaults()
-            //然后在填入内容
-            let li_id = current_li.getAttribute('id')
             for(let i = 0;i<model_list.length;i++){
                 let model_info = model_list[i]
-                if(model_info["id"] == li_id){
-                    //将属性赋予model-viewer
-                    //setViewerContent(viewer_id, model)
+                if(model_info["id"] == model_id){
                     viewer1.setValues(model_info)
-                    //其中要搞的是normalization
-                    viewer1.setNormalization(model_info['normalization'])
                     break
                 }
             }
+
         }
         let content = model_list
-        let li_generator = function(index, item){
-            let li = document.createElement('li')
-            li.innerText = item["aliasname"]
-            if(item["aliasname"] == null)
-                li.innerText = "未命名"
-            li.setAttribute("id", item["id"])
-            li.setAttribute("class", "model_elem")
-            return li
+        let theads = ['名称', '模型']
+        let tr_generator = function(index, item){
+            let tr = document.createElement('tr')
+            tr.setAttribute('id', item['id'])
+
+            let name_td = document.createElement('td')
+            if(item['aliasname'] != null){
+                name_td.innerHTML = item['aliasname']
+            }else{
+                name_td.innerHTML = '未命名'
+            }
+
+            let model_td = document.createElement('td')
+            model_td.innerHTML = item['modelname']
+
+            tr.appendChild(name_td)
+            tr.appendChild(model_td)
+            return tr
         }
-        createPagination(name, content, callback, li_generator)
+        createPaginationTable(name, content, callback, theads, tr_generator)
+
     })
 }
 
+/**
+ * 设置模型查看器的值
+ * @param id: 模型配置id
+ * @param data: 值
+ */
 function setViewerContent(id, data){
     let viewer = document.querySelector(id)
-    viewer.setModelName(data["modelname"])
-    viewer.setAliasName(data["aliasname"])
-    viewer.setMpp(data["dst_mpp"])
-    viewer.setSize(data["dst_size"])
-    viewer.setSpatial(data["spatial_augmentation"])
-    viewer.setStylish(data["stylish_augmentation"])
-    viewer.setNormalization(data["normalization"])
-    viewer.setOptimizer(data["optimizer"])
-    viewer.setLearnRate(data["learning_rate"])
-    viewer.setLrScheduler(data["lr_scheduler"])
+    viewer.setValues(data)
 }
 
 //刷新当前选中的模型值（根据model_list刷新）
@@ -339,6 +216,9 @@ function modifyModelDetail(elem){
     document.querySelector("#modifyDiv2").classList.remove("myHide")
 }
 
+/**
+ * 修改模型的配置
+ */
 function saveModify(){
     //TODO:查询当前选中的模型，在向服务器提交修改
     document.querySelector("#modifyDiv2").classList.add("myHide")
@@ -376,6 +256,10 @@ function saveModify(){
     })
 }
 
+/**
+ * 丢弃模型的配置修改
+ * @param elem
+ */
 function discardModify(elem){
     //直接返回，
     let parentDiv = elem.closest("div")
@@ -394,11 +278,18 @@ function discardModify(elem){
 
 }
 
+/**
+ * 获取当前选中的列表元素内部html
+ * @returns {string}
+ */
 function getCurrentSelectedList(){
     let selected_li = document.querySelector("li.elem_selected")
     return selected_li.innerHTML
 }
 
+/**
+ * 打开添加模型模态框
+ */
 function openAddModel(){
     let viewer2 = document.querySelector("#viewer2")
     viewer2.setEditable()
@@ -410,7 +301,8 @@ function openAddModel(){
                 //TODO:向服务器提交数据
                 let viewer2 = document.querySelector("#viewer2")
                 let data = viewer2.getValues()
-                data = convertLocal2Web(data)
+                //data = convertLocal2Web(data)
+
                 fetch(serverurl + "/model/addconfig", {
                     method: 'POST',
                     headers : new Headers({
@@ -420,6 +312,7 @@ function openAddModel(){
                 }).then(function(response){
                     if(response.ok){
                         console.log("提交数据成功")
+                        modelCache.init()
                     }else{
                         alert("提交数据失败")
                     }

@@ -1,10 +1,18 @@
-const serverurl = "http://huaiguangcsh.f3322.net:2004"
+// const serverurl = "http://huaiguangcsh.f3322.net:2004"
+// const serverurl = "http://59.172.144.41:2004"
+
+const serverurl = "http://medicalimage.f3322.net:2004"
 
 function replaceClass(elem, pre, pos){
     elem.classList.remove(pre)
     elem.classList.add(pos)
 }
 
+/**
+ * 获取html元素的所有邻居
+ * @param e：html元素
+ * @returns {*[]}：所有邻居元素
+ */
 function getAllSiblings(e) {
     // for collecting siblings
     let siblings = [];
@@ -262,7 +270,12 @@ function localAnno2WebAnno(local_json)
 {
     let web_json = {}
     let selector_content = local_json["target"]["selector"]
-    web_json['cir_rect'] = selector_content[0]["value"].split(":")[1]
+    if(Array.isArray(selector_content)){
+        web_json['cir_rect'] = selector_content[0]["value"].split(":")[1]
+    }
+    else{
+        web_json['cir_rect'] = selector_content["value"].split(":")[1]
+    }
     web_json["anno_class"] = local_json["body"][0]["value"]
     return web_json
 }
@@ -275,7 +288,7 @@ function webAnno2LocalAnno(web_json)
 {
     let local_json = {}
     local_json["@context"] = "http://www.w3.org/ns/anno.jsonld";
-    local_json["id"] = "#a88b22d0-6106-4872-9435-c78b5e89fede";
+    local_json["id"] = "#0";
     local_json["type"] = "Annotation";
 
     let body = new Array();
@@ -292,8 +305,8 @@ function webAnno2LocalAnno(web_json)
     if(web_json["type"] == "Rect"){
         selector_content["type"] = "FragmentSelector";
         selector_content["conformsTo"] = "http://www.w3.org/TR/media-frags/";
-        if(web_json["cir_rect"] == "null"){
-            //如果是第一次，那么就为空，那么我就直接在中间画框
+        if(web_json["cir_rect"] == null){
+            //如果是第一次，那么就为空，那么我就直接在左上角畫框
             let center_point = {}
             center_point['x'] = parseInt(web_json['center_point'].split(',')[0])
             center_point['y'] = parseInt(web_json['center_point'].split(',')[1])
@@ -301,10 +314,30 @@ function webAnno2LocalAnno(web_json)
             top_left['x'] = parseInt(web_json['top_left'].split(',')[0])
             top_left['y'] = parseInt(web_json['top_left'].split(',')[1])
             let x = 50
-            let y = x
-            let w = ((center_point['x'] - top_left['x']) - x) * 2
-            let h = w
-            selector_content['value'] = "xywh=pixel:" + x.toString() + y.toString() + w.toString() + h.toString()
+            let y = 50
+            let w = ((center_point['x'] - top_left['x']) - x)
+            let h = ((center_point['y'] - top_left['y']) - y)
+            selector_content['value'] = "xywh=pixel:"
+                + x.toString() + ','
+                + y.toString() + ','
+                + w.toString() + ','
+                + h.toString()
+        }else{
+            //如果不是第一次
+            let top_left = {}
+            top_left['x'] = parseInt(web_json['top_left'].split(',')[0])
+            top_left['y'] = parseInt(web_json['top_left'].split(',')[1])
+
+            let x = parseInt(web_json['cir_rect'].split(',')[0]) - top_left['x']
+            let y = parseInt(web_json['cir_rect'].split(',')[1]) - top_left['y']
+            let w = parseInt(web_json['cir_rect'].split(',')[2])
+            let h = parseInt(web_json['cir_rect'].split(',')[3])
+
+            selector_content['value'] = "xywh=pixel:"
+                + x.toString() + ','
+                + y.toString() + ','
+                + w.toString() + ','
+                + h.toString()
         }
     }
     selector.push(selector_content);
@@ -342,13 +375,28 @@ function web2local_version(web_json){
     //console.log(local_json);
 }
 
+function changeAnnoColor(anno){
+    let id = anno['id']
+
+    let elem = document.querySelector("g[data-id=" + "\"" + id + "\"" + "]")
+    if(anno['body'][0]['value']){
+        elem.classList.add(anno['body'][0]['value'])
+    }
+    // if(anno['body'][1]['value'] == "HSIL"){
+    //     elem.classList.add("HSIL")
+    // }
+    // if(anno['body'][1]['value'] == "LSIL"){
+    //     elem.classList.add("LSIL")
+    // }
+}
+
 function createCanvas(elem, status, local_json, update_function){
     let anno = Annotorious.init({
         image:elem,
         locale:'auto',
-        widget:[
-            'COMMENT',
-            {widget: 'TAG', vocabulary:['HSIL', 'LSIL', 'Normal']}
+        widgets:[
+            // 'COMMENT',
+            {widget: 'TAG', vocabulary:['HSIL', 'LSIL', 'Ascus', 'Normal']}
         ]
     })
     anno.setAuthInfo({
@@ -356,40 +404,50 @@ function createCanvas(elem, status, local_json, update_function){
         displayName: 'rainer'
     });
 
+    anno.on("createAnnotation", function(annotation){
+        console.log('crate annotation')
+    })
+
     anno.on('updateAnnotation', function(annotation, previous){
+        changeAnnoColor(annotation)
         console.log('update annotation')
+
         //将同层级的图像改为逗号
-        if(status!=null){
-            status.src='images/tick.jpg'
-        }
+        // if(status!=null){
+        //     // status.src='images/tick.jpg'
+        //     status.src = 'images/checked.svg'
+        // }
+        update_function(annotation, elem, status)
+
     })
     anno.setDrawingTool('rect');
-    // let local_str = '{ \n' +
-    //     '    "@context": "http://www.w3.org/ns/anno.jsonld",\n' +
-    //     '    "id": "#0",\n' +
-    //     '    "type": "Annotation",\n' +
-    //     '    "body": [{\n' +
-    //     '      "type": "TextualBody",\n' +
-    //     '      "value": "It\'s Hallstatt in Upper Austria"\n' +
-    //     '    }, {\n' +
-    //     '      "type": "TextualBody",\n' +
-    //     '      "purpose": "tagging",\n' +
-    //     '      "value": "Hallstatt"\n' +
-    //     '    }, {\n' +
-    //     '      "type": "TextualBody",\n' +
-    //     '      "purpose": "tagging",\n' +
-    //     '      "value": "Upper Austria"\n' +
-    //     '    }],\n' +
-    //     '    "target": {\n' +
-    //     '      "selector": [{\n' +
-    //     '        "type": "FragmentSelector",\n' +
-    //     '        "conformsTo": "http://www.w3.org/TR/media-frags/",\n' +
-    //     '        "value": "xywh=pixel:1,1,500,500"\n' +
-    //     '      }]\n' +
-    //     '    }\n' +
-    //     '  }'
-    //
+
+    if(local_json == null){
+        let local_str = ' { \n' +
+            '    "@context": "http://www.w3.org/ns/anno.jsonld",\n' +
+            '    "id": "#0",\n' +
+            '    "type": "Annotation",\n' +
+            '    "body": [{\n' +
+            '      "type": "TextualBody",\n' +
+            '      "value": "Ceil"\n' +
+            '    }, {\n' +
+            '      "type": "TextualBody",\n' +
+            '      "purpose": "tagging",\n' +
+            '      "value": "HSIL"\n' +
+            '    }],\n' +
+            '    "target": {\n' +
+            '      "selector": [{\n' +
+            '        "type": "FragmentSelector",\n' +
+            '        "conformsTo": "http://www.w3.org/TR/media-frags/",\n' +
+            '        "value": "xywh=pixel:2,2,450,450"\n' +
+            '      }]\n' +
+            '    }\n' +
+            '  }'
+        local_json = JSON.parse(local_str)
+    }
+
     // let local_json = JSON.parse(local_str)
+
     anno.addAnnotation(local_json)
 
     return anno
@@ -516,6 +574,126 @@ function fetchGetText(url){
     })
 }
 
+/**
+ * 获取对象的类型，例如Promise对象返回'promise'
+ * @param obj
+ * @returns {string}
+ */
 function typeOf(obj) {
     return {}.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase();
+}
+
+function simpleTdGenerator(index, item){
+    let td_list = []
+    for(let key in item){
+        let td = document.createElement('td')
+        if(typeOf(item[key]) == 'array'){
+            td.innerHTML = item[key].length
+        }
+        else {
+            if(item[key] == null){
+                td.innerHTML = '空'
+            }else{
+                td.innerHTML = item[key]
+            }
+        }
+        td_list.push(td)
+    }
+    return td_list
+}
+
+class SelectBase extends HTMLElement{
+    constructor() {
+        super();
+    }
+
+    getRealId(id){
+        // return '#' + this.id_prefix + id
+        return '#' + this.getAttribute('id') + id
+    }
+
+    //单独设置id
+    setSpecialId(content){
+        let multiSelectors = content.querySelectorAll(".ui.dropdown")
+        Array.from(multiSelectors).forEach(function(elem){
+            elem.id = this.id_prefix + elem.id
+        }.bind(this))
+        return content
+    }
+
+    //为特有的id设置select
+    initSelect(id, data){
+        let realID = this.getRealId(id)
+        initSelect(realID, data)
+    }
+
+    //其中key是name
+    setValues(data){
+        let $form = $(this).children(".ui.form")
+        let keys = this.getKeys()
+        for(let key in data){
+            let value = data[key]
+            if(keys.includes(key)){
+                $form.form('set value', key, value)
+            }
+        }
+    }
+
+    getKeys(){
+        let ret = []
+        let select_elems = this.querySelectorAll('select')
+        Array.from(select_elems).forEach(function(select_elem){
+            ret.push(select_elem.getAttribute('name'))
+        })
+        let select_elems2 = this.querySelectorAll('input')
+        Array.from(select_elems2).forEach(function(select_elem){
+            ret.push(select_elem.getAttribute('name'))
+        })
+        return ret
+    }
+
+    setValue(key, value){
+        let $form = $(this).children(".ui.form")
+        $form.form('set value', key, value)
+    }
+
+    getValues(){
+        let $form = $(this).children(".ui.form")
+        let values = $form.form('get values')
+        return values
+    }
+
+    /**
+     * 检查表单是否有空
+     * @returns {boolean}
+     */
+    existEmpty(){
+        //let $form = $(".ui.form")
+        let $form = $(this).children(".ui.form")
+        let values = $form.form('get values')
+        for(let key in values){
+            let attrName = key
+            let attrValue = values[key]
+            if(attrValue == '' || attrValue.length == 0)
+                return true
+        }
+        return false
+    }
+
+    restoreDefaults(){
+        let ids = this.getIds()
+        for(let i = 0;i<ids.length;i++){
+            $('#' + ids[i]).dropdown('restore defaults')
+        }
+    }
+
+    //
+    getIds(){
+        let ret = []
+        let select_elems = this.querySelectorAll('select')
+        Array.from(select_elems).forEach(function(select_elem){
+            ret.push(select_elem.getAttribute('id'))
+        })
+        return ret
+    }
 }

@@ -1,3 +1,6 @@
+/**
+ * 查询到的切片数量框、样本数量狂、样本名称这几个表单的集合，方便统一获取其值(以后可以统一继承自sSlectBase类，以简化代码)
+ */
 class SampleInfo extends HTMLElement{
     constructor() {
         super();

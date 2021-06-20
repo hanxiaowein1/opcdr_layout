@@ -15,79 +15,16 @@
  * 的自己还是力有未逮。
  */
 
-class DatasetCache {
-    constructor() {
-        //网络原生的数据集信息
-        this.samplegroups = []
-        getSamplegroup().then(function(json_data){
-            this.samplegroups = json_data['data']['samplegroups']
-        }.bind(this))
-    }
+/**
+ * 通过Promise.all，我看到了缓存的希望，因为以前需要用迭代来实现一次性大量的fetch请求，但是现在通过promise.all可以
+ * 实现对多个fetch的等待，并且Promise.all([])空列表也是支持等待的，也就是说，当我在根据数据集id来查询sampleCache
+ * 中的内容时，如果一个都不需要fetch，那么就可以使用Promise.all([])，如果发送了fetch请求，同样可以加到fetch列表中
+ * 进行then操作。那么代码写起来就会变得很方便。
+ * @type {*[]}
+ */
 
-    init(){
-        return getSamplegroup().then(function(json_data){
-            this.samplegroups = json_data['data']['samplegroups']
-        }.bind(this))
-    }
 
-    queryIndexById(id){
-        for(let i = 0;i<this.samplegroups.length;i++){
-            if(this.samplegroups[i]['id'] == id){
-                return i
-            }
-        }
-        return -1
-    }
 
-    empty(){
-        if(this.samplegroups.length == 0){
-            return true
-        }else{
-            return false
-        }
-    }
-
-    getSampleIds(dataset_id){
-        if(!this.empty()){
-            let index = this.queryIndexById(dataset_id)
-            if(index == -1){
-                return []
-            }else{
-                return this.samplegroups[index]['sampleconfigids']
-            }
-        }
-    }
-}
-
-class SampleCache{
-    constructor() {
-        this.sampleconfigs = []
-        getSampleconfig().then(function(json_data){
-            this.sampleconfigs = json_data['data']['sampleconfigs']
-        }.bind(this))
-    }
-
-    queryIndexById(id){
-        for(let i = 0;i<this.sampleconfigs.length;i++){
-            if(this.samplegroups[i]['id'] == id){
-                return i
-            }
-        }
-        return -1
-    }
-
-    empty(){
-        if(this.sampleconfigs.length == 0){
-            return true
-        }else{
-            return false
-        }
-    }
-
-}
-
-let datasetCache = new DatasetCache()
-let sampleCache = new SampleCache()
 
 //数据集的缓存信息
 let samplegroups = []
@@ -98,8 +35,7 @@ let sampleconfigs = []
 //样本map:key为样本id，value为样本信息，为转换后的sampleconfigs，为了方便查询()
 let sampleconfigs_map = {}
 
-
-//初始化nav_bar
+//初始化导航栏
 fetch('nav_bar.html').then(function(response){
     return response.text()
 }).then(function(text){
@@ -110,8 +46,6 @@ fetch('nav_bar.html').then(function(response){
     body.insertBefore(doc.querySelector('ul'), body.firstChild)
     loadDataSetList()
 
-    //初始化各个模态框
-    //1.添加样本模态框
     let slide_query = document.querySelector("div#addSampleDiv slide-query")
     let anno_query = document.querySelector("div#addSampleDiv anno-query")
     slide_query.init()
@@ -119,11 +53,16 @@ fetch('nav_bar.html').then(function(response){
 
 })
 
+/**
+ * 初始化数据集列表
+ */
 function loadDataSetList(){
     getSamplegroup().then(function(json_data){
         let samplegroups = json_data['data']['samplegroups']
         let name = "pagination_dataset"
-        let theads = ['名称', 'id', '样本数量', '创建时间']
+        //let theads = ['id', '名称', '样本数量', '训练数量', '测试数量', '创建时间']
+        //let theads = ['id', '名称', '样本数量', '训练样本数量', '验证样本数量', '创建时间']
+        let theads = ['名称', '训练样本数量', '验证样本数量']
         let callback = function(event){
             document.querySelector('#dataset_list').classList.add('myHide')
             document.querySelector('#sample_div').classList.remove('myHide')
@@ -133,31 +72,28 @@ function loadDataSetList(){
             let tr = document.createElement('tr')
             tr.setAttribute('id', item['id'])
 
-            let td1 = document.createElement('td')
-            if(item['aliasname'] != null){
-                td1.innerHTML = item['aliasname']
-            }else{
-                td1.innerHTML = '未命名'
-            }
-            let td2 = document.createElement('td')
-            td2.innerHTML = item['id']
-            let td3 = document.createElement('td')
-            td3.innerHTML = item['sampleconfigids'].length
-            let td4 = document.createElement('td')
-            td4.innerHTML = item['create_time']
+            let name_td = document.createElement('td')
+            name_td.innerHTML = item['aliasname']
+            tr.appendChild(name_td)
 
-            //个人认为加上训练集/测试集的数据数量会更好
+            let trainTestSampleNumber = datasetCache.getTrainTestSampleNumber(item['id'], sampleCache)
 
-            tr.appendChild(td1)
-            tr.appendChild(td2)
-            tr.appendChild(td3)
-            tr.appendChild(td4)
+            //let td_list = simpleTdGenerator(index, item)
+            let tdTrainSampleNumber = document.createElement('td')
+            tdTrainSampleNumber.innerHTML = trainTestSampleNumber['train']
+            tr.appendChild(tdTrainSampleNumber)
+            let tdTestSampleNumber = document.createElement('td')
+            tdTestSampleNumber.innerHTML = trainTestSampleNumber['test']
+            tr.appendChild(tdTestSampleNumber)
             return tr
         }
         createPaginationTable(name, datasetCache.samplegroups, callback, theads, tr_generator)
     })
 }
 
+/**
+ * 初始化样本列表
+ */
 function loadSampleList(){
     document.querySelector('div#sample_shower1').classList.add('myHide')
     let slide_viewer = document.querySelector("div#sample_div slide-query")
@@ -169,74 +105,110 @@ function loadSampleList(){
     let data = {'samplegroupid' : dataset_id}
 
     getSamplegroupbyid(data).then(function(json_data){
+
         let sampleconfigids = json_data['data']['samplegroup']['sampleconfigids']
-        //然后根据样本id查询样本
+        /**
+         * 以前是通过fetch递归查询来实现循环的，但是效率太慢，要递归n次fetch，即串行了这么久
+         * 但是现在有个promise_all，就可以等待所有的fetch了，很方便，
+         * 而且递归的程序看起来也很诡异
+         */
         let sample_list = []
-        let initialize_sample_list = function(sampleconfigids, i){
-            if(i == sampleconfigids.length){
-                let name = 'pagination_sample'
-                //展示样本
-                let callback = function(event){
-                    let sample_shower1 = document.querySelector('div#sample_shower1')
-                    if(sample_shower1.classList.contains('myHide')){
-                        sample_shower1.classList.remove('myHide')
-                    }
-                    let current_click_elem = event.target
-                    let tr = current_click_elem.closest('tr')
-                    let sample_id = tr.getAttribute('id')
-                    let data = {"sampleconfigId" : sample_id}
-                    //根据样本id查询样本信息
-                    getSampleconfigById(data).then(function(json_data){
-                        let sampleconfig = json_data['data']['sampleconfig']
-
-                        let slide_query = document.querySelector('#slide_query1')
-                        let anno_query = document.querySelector('#anno_query1')
-                        let sample_info = document.querySelector('div#sample_shower1 sample-info')
-                        slide_query.restoreDefaults()
-                        slide_query.setValues(sampleconfig)
-                        anno_query.restoreDefaults()
-                        anno_query.setValues(sampleconfig)
-                        sample_info.setValues(sampleconfig)
-                    })
-
-                    console.log('展示样本')
-                }
-                let content = sample_list
-                let theads = ['样本名称', '训练/测试']
-                let tr_generator = function(index, item){
-                    let tr = document.createElement('tr')
-                    tr.setAttribute('id', item['id'])
-                    let td = document.createElement('td')
-                    //td.innerHTML = item['id']
-                    if(item['aliasname'] != null){
-                        td.innerHTML = item['aliasname']
-                    }else{
-                        td.innerHTML = '未命名'
-                    }
-                    let slide_category_td = document.createElement('td')
-                    slide_category_td.innerHTML = item['slide_category']
-                    tr.appendChild(td)
-                    tr.appendChild(slide_category_td)
-                    return tr
-                }
-                createPaginationTable(name, content, callback, theads, tr_generator)
-                return
-            }
-            let data = {'sampleconfigId' : sampleconfigids[i]}
-            getSampleconfigById(data).then(function(ret_json){
-                sample_list.push(ret_json['data']['sampleconfig'])
-                initialize_sample_list(sampleconfigids, i + 1)
-            })
+        let fetch_array = []
+        for(const elem of sampleconfigids){
+            let data = {'sampleconfigId' : elem}
+            fetch_array.push(getSampleconfigById(data))
         }
-        initialize_sample_list(sampleconfigids, 0)
+
+        Promise.all(fetch_array).then(function(rets){
+            for(let elem of rets){
+                sample_list.push(elem['data']['sampleconfig'])
+            }
+
+            //然后在初始化样本列表
+            let name = 'pagination_sample'
+            //展示样本
+            let callback = function(event){
+                let sample_shower1 = document.querySelector('div#sample_shower1')
+                if(sample_shower1.classList.contains('myHide')){
+                    sample_shower1.classList.remove('myHide')
+                }
+                let current_click_elem = event.target
+                let tr = current_click_elem.closest('tr')
+                let sample_id = tr.getAttribute('id')
+                let data = {"sampleconfigId" : sample_id}
+                //根据样本id查询样本信息
+                getSampleconfigById(data).then(function(json_data){
+                    let sampleconfig = json_data['data']['sampleconfig']
+
+                    let slide_query = document.querySelector('#slide_query1')
+                    let anno_query = document.querySelector('#anno_query1')
+                    let sample_info = document.querySelector('div#sample_shower1 sample-info')
+                    slide_query.restoreDefaults()
+                    slide_query.setValues(sampleconfig)
+                    anno_query.restoreDefaults()
+                    anno_query.setValues(sampleconfig)
+                    sample_info.setValues(sampleconfig)
+                })
+
+                console.log('展示样本')
+            }
+            let content = sample_list
+            // let theads = ['样本名称', '训练/测试', '数量']
+            let theads = ['样本名称', '训练/验证', '类别']
+            let tr_generator = function(index, item){
+                let tr = document.createElement('tr')
+                tr.setAttribute('id', item['id'])
+                let td = document.createElement('td')
+                //td.innerHTML = item['id']
+                if(item['aliasname'] != null){
+                    td.innerHTML = item['aliasname']
+                }else{
+                    td.innerHTML = '未命名'
+                }
+                let slide_category_td = document.createElement('td')
+                if(item['slide_category'] == "test"){
+                    slide_category_td.innerHTML = "val"
+                }else{
+                    slide_category_td.innerHTML = "train"
+                }
+                //slide_category_td.innerHTML = item['slide_category']
+
+                let type_td = document.createElement('td')
+                if(item['is_positive'].includes('Yes')){
+                    type_td.innerHTML = "pos"
+                }else{
+                    type_td.innerHTML = "neg"
+                }
+
+                // let annoNumberTd = document.createElement('td')
+                // annoNumberTd.innerHTML = item['anno_number']
+
+                // let numberTd = document.createElement('td')
+                // numberTd.innerHTML = item['select_anno_number']
+
+                tr.appendChild(td)
+                tr.appendChild(slide_category_td)
+                tr.appendChild(type_td)
+                //tr.appendChild(numberTd)
+                return tr
+            }
+            createPaginationTable(name, content, callback, theads, tr_generator)
+
+        })
     })
 }
 
+/**
+ * 刷新sample容器
+ */
 function refreshSampleDiv(){
     refreshHtmlById('sample_center.html', '#sample_div', loadSampleList)
 }
 
-//添加数据集
+/**
+ * 添加数据集
+ * @param elem
+ */
 function addDataSet(elem){
     // let addDataSetElem = document.querySelector("div#addDataSetDiv ui form")
     $("#addDataSetDiv").modal({
@@ -271,12 +243,20 @@ function addDataSet(elem){
     }).modal('show')
 }
 
+/**
+ * 从样本列表返回数据集列表
+ * @param elem
+ */
 function return2DataSetList(elem){
     document.querySelector("#sample_div").classList.add("myHide")
     document.querySelector("#dataset_list").classList.remove("myHide")
     refreshHtmlByIdWithPromise('sample_center.html', '#dataset_list').then(loadDataSetList)
 }
 
+/**
+ * 添加样本
+ * @param elem
+ */
 function addSample(elem){
     $("#addSampleDiv").modal({
         onApprove : function(){
@@ -309,6 +289,8 @@ function addSample(elem){
                             addSampleconfigInSamplegroup(data).then(function(response){
                                 if(response.ok){
                                     console.log('在数据集中添加样本成功')
+                                    sampleCache.init()
+                                    datasetCache.init()
                                     //刷新样本列表
                                     refreshSampleDiv()
                                 }else{
@@ -326,6 +308,10 @@ function addSample(elem){
     }).modal('show')
 }
 
+/**
+ * 查询标注的数量
+ * @param elem
+ */
 function queryAnnoCount(elem){
     let slide_query = document.querySelector("div#addSampleDiv slide-query")
     let anno_query = document.querySelector("div#addSampleDiv anno-query")
@@ -347,15 +333,17 @@ function queryAnnoCount(elem){
     })
 }
 
+/**
+ * 查询切片的数量
+ */
 function querySlideCount(){
     let slide_query = document.querySelector("div#addSampleDiv slide-query")
-    let slide_values = slide_query.getValues()
-    if(checkUiFormValueExistEmpty(slide_values)){
+    if(slide_query.existEmpty()){
         console.log("切片选择栏目存在空！")
         return
     }
 
-    let data = slide_values
+    let data = slide_query.getValues()
     querySlideNumber(data).then(function(json_data){
         let slide_number = json_data['data']['number']
         // let $form = $('div#queryResultDiv .ui.form')
@@ -365,6 +353,11 @@ function querySlideCount(){
     })
 }
 
+/**
+ * 检查表单的值是否存在空
+ * @param values: 表单的key和value
+ * @returns {boolean}: 如果存在空，则返回true，否则返回false
+ */
 function checkUiFormValueExistEmpty(values){
     for(let key in values) {
         let attrName = key
@@ -376,7 +369,10 @@ function checkUiFormValueExistEmpty(values){
     return false
 }
 
-//添加现有样本
+/**
+ * 添加现有样本
+ * @param elem
+ */
 function addExistSample(elem){
     $('#addExistSampleDiv').modal({
         onApprove : function(){
@@ -420,26 +416,36 @@ function addExistSample(elem){
         }
         //在这里应该去掉数据集中已经包含的样本，让用户无法进行选择
         let dataset_id = document.querySelector('div#dataset_list tr.elem_selected').getAttribute('id')
-        let temp_data = {'id':dataset_id}
-        let temp_sample_data = {}
+        let temp_data = {'samplegroupid':dataset_id}
+        let temp_sample_data = []
 
         getSamplegroupbyid(temp_data).then(function(json_data){
             let sampleconfigids = json_data['data']['samplegroup']['sampleconfigids']
             if(sampleconfigids != null){
                 //将sample_data中的id与sampleconfigids中的id进行对比
-                for(let key in sample_data){
-                    //如果在则为true
-                    let flag = false
-                    for(let i = 0;i<sampleconfigids.length;i++){
-                        if(key == sampleconfigids[i]){
-                            flag = true
-                            break
+                for(let i = 0;i<sample_data.length;i++){
+                    let sample_data_elem = sample_data[i]
+                    let temp_sample_data_elem = {}
+                    let size = 0
+                    for(let key in sample_data_elem){
+                        //如果在则为true
+                        let flag = false
+                        for(let i = 0;i<sampleconfigids.length;i++){
+                            if(key == sampleconfigids[i]){
+                                flag = true
+                                break
+                            }
+                        }
+                        if(!flag){
+                            temp_sample_data_elem[key] = sample_data_elem[key]
+                            size = size + 1
                         }
                     }
-                    if(!flag){
-                        temp_sample_data[key] = sample_data[key]
+                    if(size != 0){
+                        temp_sample_data.push(temp_sample_data_elem)
                     }
                 }
+
                 sample_data = temp_sample_data
             }
             //初始化样本列表
@@ -449,92 +455,4 @@ function addExistSample(elem){
 
         })
     })
-}
-
-/**
- * 在数据集中添加现有的样本id列表
- * @param data
- * @returns {Promise<Response>}
- */
-function addSampleconfigInSamplegroup(data){
-    return postJsonGetResponse(serverurl + '/annotation/addSampleconfigInSamplegroup', data)
-}
-
-/**
- * 获取当前所有的样本信息
- * @returns {Promise<unknown>}
- */
-function getSampleconfig(){
-    return fetchGetJson(serverurl + '/annotation/getSampleconfig')
-}
-
-/**
- * 通过数据集id查询数据集下的所有样本id
- * @param dataset_id
- * @returns {Promise<unknown>}
- */
-function getSamplegroupbyid(data){
-    //let data = {'samplegroupid' : dataset_id}
-    return postJsonGetJson(serverurl + '/annotation/getSamplegroupbyid', data)
-}
-
-/**
- * 这个是用来添加样本的，但是这个样本并不属于任何数据集
- * @param data
- */
-function addSampleconfig(data){
-    return postJsonGetResponse(serverurl + '/annotation/addSampleconfig', data)
-}
-
-/**
- * 查询所有数据集信息
- * @returns {Promise<unknown>}
- */
-function getSamplegroup(){
-    return fetchGetJson(serverurl + '/annotation/getSamplegroup')
-}
-
-/**
- * 根据数据集id查询其中包含的样本id列表
- * @param data
- * @returns {Promise<unknown>}
- */
-function getSamplegroupbyid(data){
-    return postJsonGetJson(serverurl + '/annotation/getSamplegroupbyid', data)
-}
-
-/**
- * 根据样本id查询样本配置
- * @param data
- * @returns {Promise<unknown>}
- */
-function getSampleconfigById(data){
-    return postJsonGetJson(serverurl + '/annotation/getSampleconfigById', data)
-}
-
-/**
- * 添加数据集
- * @param data
- * @returns {Promise<unknown>}
- */
-function addSamplegroup(data){
-    return postJsonGetResponse(serverurl + '/annotation/addSamplegroup', data)
-}
-
-/**
- * 查询标注的数量
- * @param data
- * @returns {Promise<unknown>}
- */
-function queryAnnoNumber(data){
-    return postJsonGetJson(serverurl + '/annotation/queryNumber', data)
-}
-
-/**
- * 查询切片的数量
- * @param data
- * @returns {Promise<unknown>}
- */
-function querySlideNumber(data){
-    return postJsonGetJson(serverurl + '/slide/queryNumber', data)
 }

@@ -1,0 +1,23 @@
+svg.a9s-annotationlayer .a9s-selection.HSIL .a9s-inner,
+svg.a9s-annotationlayer .a9s-annotation.HSIL .a9s-inner  {
+    stroke-width:4;
+    stroke:red;
+}
+
+svg.a9s-annotationlayer .a9s-selection.LSIL .a9s-inner,
+svg.a9s-annotationlayer .a9s-annotation.LSIL .a9s-inner  {
+    stroke-width:4;
+    stroke:orange;
+}
+
+svg.a9s-annotationlayer .a9s-selection.Ascus .a9s-inner,
+svg.a9s-annotationlayer .a9s-annotation.Ascus .a9s-inner  {
+    stroke-width:4;
+    stroke:blue;
+}
+
+svg.a9s-annotationlayer .a9s-selection.Normal .a9s-inner,
+svg.a9s-annotationlayer .a9s-annotation.Normal .a9s-inner  {
+    stroke-width:4;
+    stroke:green;
+}

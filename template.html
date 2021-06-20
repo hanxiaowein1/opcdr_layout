@@ -6,20 +6,139 @@
 </head>
 <body>
 
+<template id="trainAdder">
+    <div class="ui form">
+        <div class="fields">
+            <div class="field">
+                <label>名称</label>
+                <input placeholder="请输入名称" type="text" name="aliasname">
+            </div>
+            <div class="field">
+                <label>模型</label>
+                <select class="ui search dropdown" id="model_select" name="modelconfigid">
+                    <option value="">Select Model</option>
+                </select>
+            </div>
+            <!--            预训练的权重-->
+            <div class="field">
+                <label>请选择训练的批次</label>
+                <select class="ui search dropdown" name="pretrainedtrainconfigid" id="pretrainedtrainconfigid">
+                    <option value="">Select train</option>
+                    <!--                    初始化选择-->
+                </select>
+            </div>
+
+            <div class="field">
+                <label>请输入权重id</label>
+                <input placeholder="权重id" type="text" name="pretrainedepochnumber">
+            </div>
+        </div>
+
+        <div class="fields">
+            <div class="field">
+                <label>mpp</label>
+                <input placeholder="mpp，例0.293" type="text" name="dst_mpp">
+            </div>
+            <div class="field">
+                <label>大小</label>
+                <input placeholder="size，例256" type="text" name="dst_size">
+            </div>
+            <div class="field">
+                <label>normalization</label>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="text" placeholder="左界限，例-1" name="normalization_left">
+                    </div>
+                    <div class="field">
+                        <input type="text" placeholder="右界限，例1" name="normalization_right">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fields">
+            <div class="field">
+                <label>数据集</label>
+                <select class="ui search dropdown" id="sample_select" name="samplegroupid">
+                    <option value="">Select Dataset</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>请输入每轮训练的个数</label>
+                <input placeholder="训练个数，以逗号分隔，例:100,100" type="text" name="dataperepoch">
+            </div>
+            <div class="field">
+                <label>空间变换</label>
+                <select class="ui search dropdown" multiple="" name="spatial_augmentation" id="spatial_augmentation">
+                    <option value="">Select Spatial</option>
+                    <option value="Shift">平移</option>
+                    <option value="Rotate">旋转</option>
+                    <option value="Flip">Flip</option>
+                    <option value="Scale">Scale</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>风格变换</label>
+                <select class="ui search dropdown" multiple="" name="stylish_augmentation" id="stylish_augmentation">
+                    <option value="">Select stylish</option>
+                    <option value="HSV disturb">HSV disturb</option>
+                    <option value="RGB switch">RGB switch</option>
+                    <option value="Edge Gaussian Blur">Edge Gaussian Blur</option>
+                    <option value="Sharp">Sharp</option>
+                    <option value="Gamma adjust">Gamma adjust</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="fields">
+            <div class="field">
+                <label>optimizer</label>
+                <select class="ui search dropdown" name="optimizer" id="optimizer">
+                    <option value="">Select Optimizer</option>
+                    <option value="sgd">sgd</option>
+                    <option value="adam">adam</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>学习率</label>
+                <input placeholder="学习率，例0.01" type="text" name="learning_rate">
+            </div>
+            <div class="field">
+                <label>学习率计划</label>
+                <select class="ui search dropdown" name="lr_scheduler" id="lr_scheduler">
+                    <option value="">Select lr schedule</option>
+                    <option value="cosine">cosine</option>
+                    <option value="step">step</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>训练轮数</label>
+                <input placeholder="100" type="text" name="epochnumber">
+            </div>
+        </div>
+
+
+<!--        </div>-->
+    </div>
+</template>
+
 <template id="sampleInfo">
     <div class="ui form">
         <div class="field">
-            <label>查询的切片数量</label>
-            <input placeholder="选择的标注数量" type="text" name="slide_number">
+            <label>涂片数量</label>
+            <input placeholder="查询的涂片数量" type="text" name="slide_number">
         </div>
         <div class="field">
-            <label>查询的标注数量</label>
-            <input placeholder="选择的标注数量" type="text" name="anno_number">
+            <label>标注数量</label>
+            <input placeholder="查询的标注数量" type="text" name="anno_number">
         </div>
-        <div class="field">
-            <label>生成的数量</label>
-            <input placeholder="请填写生成的数量" type="text" name="select_anno_number">
-        </div>
+<!--        <div class="field">-->
+<!--            <label>生成的数量</label>-->
+<!--            <input placeholder="请填写生成的数量" type="text" name="select_anno_number">-->
+<!--        </div>-->
+
+
         <div class="field">
             <label>样本名称</label>
             <input placeholder="请填写样本的名称" type="text" name="aliasname">
@@ -49,8 +168,8 @@
         </div>
 
 <!--        <div class="field">-->
-<!--            <label>切片数量</label>-->
-<!--            <input placeholder="切片数量" type="text" name="slide_number">-->
+<!--            <label>涂片数量</label>-->
+<!--            <input placeholder="涂片数量" type="text" name="slide_number">-->
 <!--        </div>-->
 <!--        <div class="field">-->
 <!--            <label>标注数量</label>-->
@@ -68,45 +187,45 @@
         <div class="field">
             <label>批次</label>
             <select multiple="" class="ui search dropdown" id="slide_group_select" name="slide_group">
-                <option value="">Select batch</option>
+<!--                <option value="">Select batch</option>-->
             </select>
         </div>
         <div class="field">
             <label>格式</label>
             <select multiple="" class="ui search dropdown" id="slide_format_select" name="slide_format">
-                <option value="">Select format</option>
+<!--                <option value="">Select format</option>-->
             </select>
         </div>
         <div class="field">
             <label>制片方式</label>
             <select multiple="" class="ui search dropdown" id="pro_method_select" name="pro_method">
-                <option value="">Select pro method</option>
+<!--                <option value="">Select pro method</option>-->
             </select>
         </div>
         <div class="field">
             <label>拍摄方式</label>
             <select multiple="" class="ui search dropdown" id="image_method_select" name="image_method">
-                <option value="">Select image method</option>
+<!--                <option value="">Select image method</option>-->
             </select>
         </div>
         <div class="field">
             <label>放大倍率</label>
             <select multiple="" class="ui search dropdown" id="zoom_select" name="zoom">
-                <option value="">Select zoom</option>
+<!--                <option value="">Select zoom</option>-->
             </select>
         </div>
         <div class="field">
             <label>是否阳性</label>
             <select multiple="" class="ui search dropdown" id="is_positive_select" name="is_positive">
-                <option value="">Select is positive</option>
+<!--                <option value="">Select is positive</option>-->
             </select>
         </div>
         <div class="field">
-            <label>用于训练or测试</label>
+            <label>用于训练or验证</label>
             <select multiple="" class="ui search dropdown" id="slide_category" name="slide_category">
                 <option value="">Select Slide Category</option>
                 <option value="train">训练</option>
-                <option value="test">测试</option>
+                <option value="test">验证</option>
             </select>
         </div>
     </div>
@@ -130,66 +249,66 @@
             <label>模型名称</label>
             <input placeholder="模型名称" type="text" name="aliasname">
         </div>
-        <div class="field disabled">
-            <label>mpp</label>
-            <input placeholder="mpp" type="text" name="dst_mpp">
-        </div>
-        <div class="field disabled">
-            <label>大小</label>
-            <input placeholder="size" type="text" name="dst_size">
-        </div>
-        <div class="field disabled">
-            <label>空间变换</label>
-            <select class="ui search dropdown" multiple="" name="spatial_augmentation" id="spatial_augmentation">
-                <option value="">Select Spatial</option>
-                <option value="Shift">平移</option>
-                <option value="Rotate">旋转</option>
-                <option value="Flip">Flip</option>
-                <option value="Scale">Scale</option>
-            </select>
-        </div>
-        <div class="field disabled">
-            <label>风格变换</label>
-            <select class="ui search dropdown" multiple="" name="stylish_augmentation" id="stylish_augmentation">
-                <option value="">Select stylish</option>
-                <option value="HSV disturb">HSV disturb</option>
-                <option value="RGB switch">RGB switch</option>
-                <option value="Edge Gaussian Blur">Edge Gaussian Blur</option>
-                <option value="Sharp">Sharp</option>
-                <option value="Gamma adjust">Gamma adjust</option>
-            </select>
-        </div>
-        <div class="field disabled">
-            <label>normalization</label>
-            <div class="two fields">
-                <div class="field">
-                    <input type="text" placeholder="左界限" name="normalization_left">
-                </div>
-                <div class="field">
-                    <input type="text" placeholder="右界限" name="normalization_right">
-                </div>
-            </div>
-        </div>
-        <div class="field disabled">
-            <label>optimizer</label>
-            <select class="ui search dropdown" name="optimizer" id="optimizer">
-                <option value="">Select Optimizer</option>
-                <option value="sgd">sgd</option>
-                <option value="adam">adam</option>
-            </select>
-        </div>
-        <div class="field disabled">
-            <label>学习率</label>
-            <input placeholder="学习率" type="text" name="learning_rate">
-        </div>
-        <div class="field disabled">
-            <label>学习率计划</label>
-            <select class="ui search dropdown" name="lr_scheduler" id="lr_scheduler">
-                <option value="">Select lr schedule</option>
-                <option value="cosine">cosine</option>
-                <option value="step">step</option>
-            </select>
-        </div>
+<!--        <div class="field disabled">-->
+<!--            <label>mpp</label>-->
+<!--            <input placeholder="mpp" type="text" name="dst_mpp">-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>大小</label>-->
+<!--            <input placeholder="size" type="text" name="dst_size">-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>空间变换</label>-->
+<!--            <select class="ui search dropdown" multiple="" name="spatial_augmentation" id="spatial_augmentation">-->
+<!--                <option value="">Select Spatial</option>-->
+<!--                <option value="Shift">平移</option>-->
+<!--                <option value="Rotate">旋转</option>-->
+<!--                <option value="Flip">Flip</option>-->
+<!--                <option value="Scale">Scale</option>-->
+<!--            </select>-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>风格变换</label>-->
+<!--            <select class="ui search dropdown" multiple="" name="stylish_augmentation" id="stylish_augmentation">-->
+<!--                <option value="">Select stylish</option>-->
+<!--                <option value="HSV disturb">HSV disturb</option>-->
+<!--                <option value="RGB switch">RGB switch</option>-->
+<!--                <option value="Edge Gaussian Blur">Edge Gaussian Blur</option>-->
+<!--                <option value="Sharp">Sharp</option>-->
+<!--                <option value="Gamma adjust">Gamma adjust</option>-->
+<!--            </select>-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>normalization</label>-->
+<!--            <div class="two fields">-->
+<!--                <div class="field">-->
+<!--                    <input type="text" placeholder="左界限" name="normalization_left">-->
+<!--                </div>-->
+<!--                <div class="field">-->
+<!--                    <input type="text" placeholder="右界限" name="normalization_right">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>optimizer</label>-->
+<!--            <select class="ui search dropdown" name="optimizer" id="optimizer">-->
+<!--                <option value="">Select Optimizer</option>-->
+<!--                <option value="sgd">sgd</option>-->
+<!--                <option value="adam">adam</option>-->
+<!--            </select>-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>学习率</label>-->
+<!--            <input placeholder="学习率" type="text" name="learning_rate">-->
+<!--        </div>-->
+<!--        <div class="field disabled">-->
+<!--            <label>学习率计划</label>-->
+<!--            <select class="ui search dropdown" name="lr_scheduler" id="lr_scheduler">-->
+<!--                <option value="">Select lr schedule</option>-->
+<!--                <option value="cosine">cosine</option>-->
+<!--                <option value="step">step</option>-->
+<!--            </select>-->
+<!--        </div>-->
     </div>
 </template>
 
